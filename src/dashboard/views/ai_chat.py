@@ -1,12 +1,12 @@
 """
 AI Crime Analytics Assistant Chat View
-Provides a glassmorphic chat interface powered by OpenAI.
+Provides a glassmorphic chat interface powered by Groq.
 """
 
 import pandas as pd
 import streamlit as st
 
-from src.dashboard.ai_assistant import generate_chat_response, get_openai_client
+from src.dashboard.ai_assistant import generate_chat_response, get_groq_client
 from src.dashboard.theme import (
     BG_CARD,
     BG_DARK,
@@ -41,7 +41,7 @@ def render(
                 AI Intelligence Assistant</h1>
             </div>
             <p style="color:{TEXT_SECONDARY}; font-size:14px; margin:0; line-height:1.5;">
-            Ask questions about spatial typologies, district profiles, metropolitan policing, and anomalies.
+            Ask questions about spatial typologies, district profiles, metropolitan policing, and anomalies. Powered by Groq (LLaMA 3.3 70B).
             </p>
         </div>
         """,
@@ -54,28 +54,28 @@ def render(
             {"role": "assistant", "content": "Hello! I am the NCRB 2024 Crime Analytics AI. Ask me about district crime patterns, typologies, policing quadrants, or anomaly detection."}
         ]
 
-    client = get_openai_client()
+    client = get_groq_client()
 
     # ── Configuration Panel (API Key) ──
-    with st.expander("⚙️ Connection Settings (OpenAI API Key)", expanded=(client is None)):
+    with st.expander("⚙️ Connection Settings (Groq API Key)", expanded=(client is None)):
         st.markdown(
             f"""
             <div style="color:{TEXT_SECONDARY}; font-size:13px; margin-bottom:12px;">
-            Enter your OpenAI API key to activate the assistant. The key is only stored in your current session memory.
+            Enter your Groq API key to activate the assistant. The key is only stored in your current session memory.
             </div>
             """,
             unsafe_allow_html=True,
         )
         api_key_input = st.text_input(
-            "OpenAI API Key",
+            "Groq API Key",
             type="password",
-            placeholder="sk-...",
-            value=st.session_state.get("openai_api_key", ""),
-            help="Your API key from platform.openai.com",
-            key="openai_api_key"
+            placeholder="gsk_...",
+            value=st.session_state.get("groq_api_key", ""),
+            help="Your API key from console.groq.com",
+            key="groq_api_key"
         )
         if api_key_input:
-            client = get_openai_client()
+            client = get_groq_client()
             if client:
                 st.success("API Key activated. The assistant is ready.")
 
@@ -122,7 +122,7 @@ def render(
         # Generate assistant response
         with st.chat_message("assistant"):
             if client is None:
-                st.error("Please provide a valid OpenAI API Key in the settings above.")
+                st.error("Please provide a valid Groq API Key in the settings above.")
                 return
             
             message_placeholder = st.empty()
@@ -143,3 +143,4 @@ def render(
         
         # Add assistant response to chat history
         st.session_state.messages.append({"role": "assistant", "content": full_response})
+

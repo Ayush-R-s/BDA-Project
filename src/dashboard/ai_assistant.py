@@ -1,13 +1,13 @@
 """
 AI Crime Analytics Assistant — Backend Engine for Streamlit Dashboard.
-Handles OpenAI API integration, data grounding, and strict topic guardrails.
+Handles Groq API integration, data grounding, and strict topic guardrails.
 """
 
 import json
 import os
 from typing import Iterator
 
-import openai
+from groq import Groq
 import pandas as pd
 import streamlit as st
 from dotenv import load_dotenv
@@ -16,16 +16,24 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-def get_openai_client() -> openai.Client | None:
-    """Initialize and return the OpenAI client."""
-    # Check session state first, then env var
-    api_key = st.session_state.get("openai_api_key") or os.environ.get("OPENAI_API_KEY")
-    if not api_key or api_key == "your_openai_api_key_here":
+def get_groq_client() -> Groq | None:
+    """Initialize and return the Groq client."""
+    # Check session state first, then env vars (GROQ_API_KEY with OPENAI_API_KEY fallback)
+    api_key = (
+        st.session_state.get("groq_api_key")
+        or os.environ.get("GROQ_API_KEY")
+        or os.environ.get("OPENAI_API_KEY")
+    )
+    if not api_key or api_key in ("your_groq_api_key_here", "your_openai_api_key_here"):
         return None
     try:
-        return openai.Client(api_key=api_key)
+        return Groq(api_key=api_key)
     except Exception:
         return None
+
+
+# Backward-compatible alias
+get_openai_client = get_groq_client
 
 
 def generate_system_prompt(df_clusters: pd.DataFrame, df_metro: pd.DataFrame) -> str:
@@ -66,26 +74,46 @@ Your primary role is to answer questions strictly related to the NCRB 2024 Crime
     return prompt
 
 
+def get_available_model(client: Groq) -> str:
+    """Find a supported chat model from the client's available models."""
+    preferred = [
+        "openai/gpt-oss-120b",
+        "llama-3.3-70b-versatile",
+        "llama-3.1-70b-versatile",
+        "llama-3.1-8b-instant",
+        "qwen/qwen3.8-27b",
+        "openai/gpt-oss-20b",
+    ]
+    try:
+        models = [m.id for m in client.models.list().data]
+        for p in preferred:
+            if p in models:
+                return p
+        chat_models = [m for m in models if "whisper" not in m and "guard" not in m]
+        return chat_models[0] if chat_models else "openai/gpt-oss-120b"
+    except Exception:
+        return "openai/gpt-oss-120b"
+
+
 def generate_chat_response(
-    client: openai.Client,
+    client: Groq,
     messages: list[dict],
     df_clusters: pd.DataFrame,
     df_metro: pd.DataFrame
 ) -> Iterator[str]:
-    """Generate a streaming chat response using OpenAI."""
+    """Generate a streaming chat response using Groq."""
     
     system_prompt = generate_system_prompt(df_clusters, df_metro)
     
     api_messages = [{"role": "system", "content": system_prompt}]
     
-    # Process user history. If user asks about a specific city/district, we could theoretically inject context here.
-    # For now, we rely on the summary in the system prompt.
     for msg in messages:
         api_messages.append({"role": msg["role"], "content": msg["content"]})
         
     try:
+        model = get_available_model(client)
         response = client.chat.completions.create(
-            model="gpt-4o-mini",
+            model=model,
             messages=api_messages,
             stream=True,
             temperature=0.3,
@@ -97,4 +125,6 @@ def generate_chat_response(
                 yield chunk.choices[0].delta.content
                 
     except Exception as e:
-        yield f"Error communicating with OpenAI: {str(e)}"
+        yield f"Error communicating with Groq: {str(e)}"
+
+
