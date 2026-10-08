@@ -143,73 +143,54 @@ st.markdown(
             border-bottom: 2px solid {PRIMARY} !important;
         }}
 
-        /* Hide Streamlit default chrome while keeping the sidebar toggle visible */
+        /* Clean unobtrusive header without breaking sidebar interaction */
         #MainMenu {{visibility: hidden;}}
         footer {{visibility: hidden;}}
-        header {{
+        [data-testid="stDecoration"] {{display: none;}}
+        header[data-testid="stHeader"] {{
             background: transparent !important;
-            pointer-events: none !important;
-        }}
-        header [data-testid="stToolbar"] {{
-            visibility: hidden !important;
-        }}
-        header [data-testid="stDecoration"] {{
-            visibility: hidden !important;
         }}
 
-        /* Floating expand button when sidebar is collapsed */
-        [data-testid="stSidebarCollapsedControl"] {{
-            position: fixed !important;
-            top: 12px !important;
-            left: 12px !important;
-            z-index: 9999999 !important;
+        /* Ensure sidebar toggle controls are ALWAYS visible and interactive */
+        [data-testid="stSidebarCollapsedControl"],
+        [data-testid="collapsedControl"],
+        [data-testid="stExpandSidebar"],
+        [data-testid="stSidebarCollapseButton"],
+        [data-testid="stSidebarHeader"],
+        [data-testid="stSidebarHeader"] button,
+        button[aria-label="Expand sidebar"],
+        button[aria-label="Collapse sidebar"] {{
             visibility: visible !important;
+            opacity: 1 !important;
             display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            background: #111726 !important;
-            border: 1px solid rgba(59, 130, 246, 0.4) !important;
-            border-radius: 8px !important;
-            padding: 4px !important;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5) !important;
-            cursor: pointer !important;
             pointer-events: auto !important;
+        }}
+
+        [data-testid="stSidebarCollapsedControl"],
+        [data-testid="collapsedControl"],
+        [data-testid="stExpandSidebar"] {{
+            background: rgba(17, 23, 38, 0.95) !important;
+            border: 1px solid rgba(59, 130, 246, 0.5) !important;
+            border-radius: 8px !important;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5) !important;
             transition: all 0.2s ease !important;
         }}
 
-        [data-testid="stSidebarCollapsedControl"]:hover {{
-            border-color: #3B82F6 !important;
-            background: #182234 !important;
-            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3) !important;
-            transform: scale(1.05);
+        [data-testid="stSidebarCollapsedControl"]:hover,
+        [data-testid="collapsedControl"]:hover,
+        [data-testid="stExpandSidebar"]:hover {{
+            background: rgba(30, 41, 59, 1) !important;
+            border-color: rgba(59, 130, 246, 0.9) !important;
+            transform: scale(1.04);
         }}
 
-        [data-testid="stSidebarCollapsedControl"] button {{
-            background: transparent !important;
-            border: none !important;
-            color: #F8FAFC !important;
-            cursor: pointer !important;
-            pointer-events: auto !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-        }}
-
-        [data-testid="stSidebarCollapsedControl"] svg {{
-            fill: #F8FAFC !important;
-            color: #F8FAFC !important;
-            width: 18px !important;
-            height: 18px !important;
-        }}
-
-        /* Sidebar collapse button (chevron inside sidebar) */
-        [data-testid="stSidebarCollapseButton"] {{
-            visibility: visible !important;
-            display: flex !important;
-            color: #F8FAFC !important;
-            pointer-events: auto !important;
-        }}
-        [data-testid="stSidebarCollapseButton"] svg {{
+        [data-testid="stSidebarCollapsedControl"] svg,
+        [data-testid="collapsedControl"] svg,
+        [data-testid="stExpandSidebar"] svg,
+        [data-testid="stSidebarCollapseButton"] svg,
+        [data-testid="stSidebarHeader"] svg,
+        button[aria-label="Expand sidebar"] svg,
+        button[aria-label="Collapse sidebar"] svg {{
             fill: #F8FAFC !important;
             color: #F8FAFC !important;
         }}
