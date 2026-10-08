@@ -20,6 +20,29 @@
 \usepackage{xcolor}
 \usepackage{colortbl}
 
+% --- Graphics Path Configuration ---
+\graphicspath{{../outputs/figures/}{./outputs/figures/}{figures/}{../figures/}{./}}
+
+% --- Graph Placeholder Helper Macro ---
+% Robust to underscores and beamer column layouts
+\newcommand{\graphplaceholder}[3][0.46\textheight]{%
+    \begin{center}
+        \IfFileExists{#2}{%
+            \includegraphics[width=\linewidth,height=#1,keepaspectratio]{#2}%
+        }{%
+            \begin{tikzpicture}
+                \node[draw=navyblue!60, fill=cardbg, rounded corners=5pt, dashed, line width=0.9pt, minimum width=0.92\linewidth, minimum height=#1, align=center, inner sep=6pt] {
+                    \textcolor{navyblue}{\textbf{\small #3}}\\[4pt]
+                    \textcolor{slatepurple}{\tiny [Target File: \texttt{\detokenize{#2}}]}\\[4pt]
+                    \textcolor{crimsonred!90}{\scriptsize $\leftarrow$ Insert Visual Graph / Plot Here $\rightarrow$}
+                };
+            \end{tikzpicture}
+        }%
+        \vskip 2pt
+        {\tiny \textbf{Figure:} #3}
+    \end{center}
+}
+
 % --- Custom Colors ---
 \definecolor{navyblue}{RGB}{20, 35, 60}
 \definecolor{crimsonred}{RGB}{160, 30, 45}
@@ -32,11 +55,14 @@
 \setbeamercolor{title}{fg=white, bg=navyblue}
 
 % --- Title Information ---
-\title[Crime Analytics Suite]{Crime Intelligence \& Geospatial Analytics Suite}
-\subtitle{Big Data Analytics (BDA) Project — NCRB 2024 National \& Metropolitan Study}
-\author[BDA Project Team]{Big Data Analytics Project}
-\institute[NCRB 2024 Analysis]{
-    Department of Computer Science \& Data Analytics \\
+\title[Crime Intelligence Suite]{Crime Intelligence \& Geospatial Analytics Suite}
+\subtitle{Big Data Analytics (BDA) Final Project — NCRB 2024 National \& Metropolitan Study}
+\author[BDA Project Team]{%
+    \textbf{Team Members:} Ayush R. (Lead Analyst) \& BDA Project Team\\[2pt]
+    \textbf{Project Guide:} Department of Computer Science \& Data Analytics
+}
+\institute[NCRB 2024 Study]{%
+    Department of Computer Science \& Data Analytics\\
     National Crime Records Bureau (NCRB) 2024 Dataset Analysis
 }
 \date{\today}
@@ -44,405 +70,94 @@
 \begin{document}
 
 % ==============================================================================
-% SLIDE 1: TITLE SLIDE (Page 1)
+% SLIDE 1: TITLE, TEAM MEMBERS AND GUIDE
 % ==============================================================================
 \begin{frame}[plain]
     \titlepage
 \end{frame}
 
 % ==============================================================================
-% SLIDE 2: EXECUTIVE SUMMARY & PROBLEM MOTIVATION (Page 2)
+% SLIDE 2: PROBLEM STATEMENT AND MOTIVATION
 % ==============================================================================
-\begin{frame}{1. Problem Statement \& Research Motivation}
+\begin{frame}{Slide 2: Problem Statement and Motivation}
     \begin{columns}[T]
         \begin{column}{0.48\textwidth}
             \begin{block}{Challenges in NCRB Crime Registries}
                 \begin{itemize}
-                    \item \textbf{High Spatial Skew:} Small subset of districts accounts for disproportionately high crime volumes.
-                    \item \textbf{State Reporting Disparities:} Variation in categorization and chargesheeting standards across states.
-                    \item \textbf{Dimensional Complexity:} Hundreds of overlapping categories spanning IPC, SLL, cyber, and vulnerable populations.
+                    \item \textbf{Extreme Spatial Skew:} Minority of urban hubs account for a disproportionately large volume of crimes.
+                    \item \textbf{State Reporting Disparities:} Variation in police reporting cultures and chargesheeting standards.
+                    \item \textbf{High-Dimensional Complexity:} Hundreds of overlapping heads across IPC, SLL, cyber, and vulnerable groups.
                 \end{itemize}
             \end{block}
         \end{column}
         \begin{column}{0.48\textwidth}
-            \begin{block}{Project Objectives \& Scope}
+            \begin{block}{Motivation \& Policy Need}
                 \begin{itemize}
-                    \item \textbf{Dual-Tier Framework:} Decouple 964 rural/urban districts from 37 million-plus metropolitan cities.
-                    \item \textbf{Unsupervised ML:} Apply PCA, K-Means clustering, and DBSCAN anomaly detection.
-                    \item \textbf{Policy Intelligence:} Benchmark metropolitan policing efficiency and decompose crime motives.
-                    \item \textbf{Deployment:} Glassmorphic interactive dashboard with LLM-powered query assistant.
+                    \item \textbf{Heterogeneous Scale:} Raw crime totals distort risk profiling across 964 diverse districts.
+                    \item \textbf{Evidence-Based Allocation:} Need to benchmark metropolitan policing and isolate localized outliers.
+                    \item \textbf{Actionable AI:} Provide law enforcement with conversational, data-grounded intelligence.
                 \end{itemize}
             \end{block}
         \end{column}
     \end{columns}
 
     \vspace{0.3cm}
-    \begin{alertblock}{Key Analytical Scope}
-        Covering \textbf{964 Districts} across \textbf{36 States/UTs} and \textbf{37 Metropolitan Cities} (NCRB 2024 Release).
+    \begin{alertblock}{Analytical Scope}
+        Evaluating \textbf{964 Districts} across \textbf{36 States/UTs} and \textbf{37 Million-Plus Cities} (NCRB 2024 Release).
     \end{alertblock}
 \end{frame}
 
 % ==============================================================================
-% SLIDE 3: DUAL-TIER DATA ARCHITECTURE (Page 3)
+% SLIDE 3: OBJECTIVES
 % ==============================================================================
-\begin{frame}{2. Dual-Tier Data Architecture \& Curation}
-    \begin{table}[h]
-        \centering
-        \small
-        \caption{Curated Data Portfolio (17 Total Audited Datasets)}
-        \rowcolors{2}{softgray}{white}
-        \begin{tabular}{lllp{6cm}}
-            \toprule
-            \textbf{Tier} & \textbf{Scope} & \textbf{Files} & \textbf{Key Analytical Dimensions Covered} \\
-            \midrule
-            \textbf{Tier 1} & District Core & 9 Files & IPC Crimes, SLL, Women Safety, Child Protection, SC/ST Atrocities, Juvenile Delinquency, Cybercrime, Missing Persons. \\
-            \midrule
-            \textbf{Tier 2} & Metropolitan & 8 Files & 3-Year Trends (2022--2024), Chargesheeting Rates, Murder Motives (35), Cyber Motives (25), Juvenile Demographics \& Socioeconomics. \\
-            \bottomrule
-        \end{tabular}
-    \end{table}
-
+\begin{frame}{Slide 3: Objectives}
     \begin{columns}[T]
         \begin{column}{0.48\textwidth}
-            \begin{block}{Portfolio Audit \& Verification}
+            \begin{block}{Core Technical Objectives}
                 \begin{itemize}
-                    \item Programmatic validation via \texttt{curated\_loader.py}.
-                    \item Verification of row/column schemas and zero file missingness.
+                    \item \textbf{Dual-Tier Ingestion:} Ingest \& clean 17 audited NCRB datasets into master feature matrices.
+                    \item \textbf{Feature Engineering:} Derive 25 per-capita composite vulnerability indices normalized via RobustScaler.
+                    \item \textbf{Unsupervised ML Pipeline:} Execute PCA dimensionality reduction, K-Means clustering ($k=5$), and DBSCAN anomaly detection.
                 \end{itemize}
             \end{block}
         \end{column}
         \begin{column}{0.48\textwidth}
-            \begin{block}{Master Matrix Scale}
+            \begin{block}{Applied Policy \& Deployment Objectives}
                 \begin{itemize}
-                    \item \textbf{District Matrix:} $964 \times 696$ feature dimensions.
-                    \item \textbf{Metro Matrix:} $37 \times 18$ efficiency metrics.
+                    \item \textbf{Metro Efficiency Benchmark:} Construct a 4-quadrant efficiency matrix across 37 million-plus cities.
+                    \item \textbf{Causal Motive Analysis:} Decompose 35 murder and 25 cybercrime motive heads.
+                    \item \textbf{Production Dashboard:} Deploy a glassmorphic Streamlit web suite with Groq LLaMA 3.3 AI.
                 \end{itemize}
-            \end{block}
-        \end{column}
-    \end{columns}
-\end{frame}
-
-% ==============================================================================
-% SLIDE 4: PREPROCESSING & DATA CLEANING PIPELINE (Page 4)
-% ==============================================================================
-\begin{frame}{3. Data Preprocessing \& Cleaning Pipeline}
-    \begin{columns}[T]
-        \begin{column}{0.55\textwidth}
-            \begin{block}{Complexities Resolved in Raw NCRB Excel Files}
-                \begin{enumerate}
-                    \item \textbf{Multi-Row Hierarchical Headers:} Rows 1--3 contain nested column descriptions; resolved via custom \texttt{openpyxl} parser.
-                    \item \textbf{Embedded State Headers:} Interspersed subtotal rows (e.g., \textit{"State: Uttar Pradesh"}) extracted into dedicated \texttt{state} columns.
-                    \item \textbf{Text-Numeric Contamination:} Asterisks, footnote labels (\textit{e.g.,} \texttt{[1]}, \texttt{*}, \texttt{+}), and non-standard missing flags (\texttt{-}, \texttt{NA}, \texttt{N.A.}) sanitized to numerical zero.
-                    \item \textbf{District Normalization:} State and district names standardized using fuzzy string mapping.
-                \end{enumerate}
-            \end{block}
-        \end{column}
-        \begin{column}{0.42\textwidth}
-            \begin{block}{Data Processing Pipeline}
-                \centering
-                \tikzstyle{startstop} = [rectangle, rounded corners, minimum width=2.5cm, minimum height=0.6cm,text centered, draw=black, fill=cardbg]
-                \begin{tikzpicture}[node distance=1.1cm]
-                    \node (raw) [startstop] {\textbf{Raw NCRB Excel Files}};
-                    \node (parse) [startstop, below of=raw] {Custom \texttt{openpyxl} Parser};
-                    \node (clean) [startstop, below of=parse] {Clean Domain Parquets};
-                    \node (master) [startstop, below of=clean] {\textbf{Master Feature Matrix}};
-                    \draw [->, thick] (raw) -- (parse);
-                    \draw [->, thick] (parse) -- (clean);
-                    \draw [->, thick] (clean) -- (master);
-                \end{tikzpicture}
-            \end{block}
-        \end{column}
-    \end{columns}
-\end{frame}
-
-% ==============================================================================
-% SLIDE 5: FEATURE ENGINEERING & DOMAIN METRICS (Page 5)
-% ==============================================================================
-\begin{frame}{4. Feature Engineering: 25 Composite Ratios}
-    To eliminate scale distortion across varying district sizes, \textbf{25 domain-specific composite indices} were engineered:
-
-    \vspace{0.15cm}
-    \begin{columns}[T]
-        \begin{column}{0.48\textwidth}
-            \begin{block}{Core Violent \& Vulnerability Ratios}
-                \footnotesize
-                \begin{itemize}
-                    \item \textbf{Violent Crime Ratio:}\\[2pt]
-                    $\displaystyle\frac{\text{Murder} + \text{Rape} + \text{Kidnap}}{\text{Total IPC Crimes} + \epsilon}$
-                    \vspace{0.1cm}
-                    \item \textbf{Women Vulnerability Share:}\\[2pt]
-                    $\displaystyle\frac{\text{Crimes against Women}}{\text{Total IPC Crimes} + \epsilon}$
-                    \vspace{0.1cm}
-                    \item \textbf{Child Crime Ratio:}\\[2pt]
-                    $\displaystyle\frac{\text{POCSO} + \text{Child Kidnap}}{\text{Total IPC Crimes} + \epsilon}$
-                \end{itemize}
-            \end{block}
-        \end{column}
-        \begin{column}{0.48\textwidth}
-            \begin{block}{Specialized Risk \& Intensity Scores}
-                \footnotesize
-                \begin{itemize}
-                    \item \textbf{Cyber Intensity Score:}\\[2pt]
-                    $\displaystyle\frac{\text{IT Act Offenses}}{\text{Total SLL Crimes} + \epsilon}$
-                    \vspace{0.1cm}
-                    \item \textbf{Trafficking Proxy:}\\[2pt]
-                    $\displaystyle\frac{\text{Missing Children}}{\text{Child Kidnapping} + \epsilon}$
-                    \vspace{0.1cm}
-                    \item \textbf{Caste Atrocity Index:}\\[2pt]
-                    $\displaystyle\frac{\text{SC Crimes} + \text{ST Crimes}}{\text{Total IPC Crimes} + \epsilon}$
-                \end{itemize}
-            \end{block}
-        \end{column}
-    \end{columns}
-
-    \vspace{0.15cm}
-    \begin{block}{Standardization Protocol}
-        \footnotesize
-        All engineered features were scaled using \textbf{RobustScaler} (median and IQR normalization) to reduce sensitivity to extreme localized outliers prior to model training.
-    \end{block}
-\end{frame}
-
-% ==============================================================================
-                    %SLIDE 6: DIMENSIONALITY REDUCTION (PCA) (Page 6)
-% ==============================================================================
-\begin{frame}{5. Dimensionality Reduction via PCA}
-    \begin{columns}[T]
-        \begin{column}{0.5\textwidth}
-            \begin{block}{Mathematical Formulation}
-                Given scaled matrix $X \in \mathbb{R}^{964 \times 25}$, Principal Component Analysis computes eigenvectors $v_k$ of covariance matrix $\Sigma$:
-                $$\Sigma v_k = \lambda_k v_k$$
-                Top 2 principal components capture \textbf{66.8\%} of total feature variance:
-                \begin{itemize}
-                    \item \textbf{PC1 (42.3\% Variance):} Captures aggregate volume scale across all crime domains.
-                    \item \textbf{PC2 (24.5\% Variance):} Discriminates between Violent/Atrocity orientation vs. Cyber/Vulnerability focus.
-                \end{itemize}
-            \end{block}
-        \end{column}
-        \begin{column}{0.46\textwidth}
-            \begin{block}{PCA Factor Loadings Summary}
-                \small
-                \rowcolors{2}{softgray}{white}
-                \begin{tabular}{lrr}
-                    \toprule
-                    \textbf{Engineered Feature} & \textbf{PC1} & \textbf{PC2} \\
-                    \midrule
-                    Total IPC Crimes & \textbf{+0.38} & -0.12 \\
-                    Violent Crime Ratio & \textbf{+0.34} & \textbf{+0.41} \\
-                    Women Vulnerability Share & +0.29 & \textbf{+0.36} \\
-                    Cyber Intensity Score & +0.18 & \textbf{-0.48} \\
-                    Caste Atrocity Index & +0.22 & \textbf{+0.33} \\
-                    Property Crime Share & +0.31 & -0.21 \\
-                    \bottomrule
-                \end{tabular}
-            \end{block}
-        \end{column}
-    \end{columns}
-\end{frame}
-
-% ==============================================================================
-% SLIDE 7: UNSUPERVISED MACHINE LEARNING — K-MEANS (Page 7)
-% ==============================================================================
-\begin{frame}{6. Machine Learning: K-Means Spatial Clustering}
-    \begin{columns}[T]
-        \begin{column}{0.48\textwidth}
-            \begin{block}{Optimization Objective}
-                $$\arg\min_{\mathbf{S}} \sum_{i=1}^{k} \sum_{\mathbf{x} \in S_i} \left\| \mathbf{x} - \boldsymbol{\mu}_i \right\|^2$$
-                Evaluated across $k \in \{2, 3, 4, 5, 6, 7, 8\}$ using:
-                \begin{itemize}
-                    \item \textbf{Elbow Method:} Inertia inflection point.
-                    \item \textbf{Silhouette Score:} Peak cluster separation at $k=5$ ($S = 0.442$).
-                    \item \textbf{Davies-Bouldin Index:} Minimized at $k=5$ ($DB = 0.812$).
-                \end{itemize}
-            \end{block}
-        \end{column}
-        \begin{column}{0.48\textwidth}
-            \begin{block}{Evaluation Metrics Matrix}
-                \small
-                \rowcolors{2}{softgray}{white}
-                \begin{tabular}{cccc}
-                    \toprule
-                    \textbf{k} & \textbf{Inertia} & \textbf{Silhouette} & \textbf{Davies-Bouldin} \\
-                    \midrule
-                    3 & 14,210 & 0.381 & 0.982 \\
-                    4 & 10,850 & 0.412 & 0.894 \\
-                    \rowcolor{cardbg}
-                    \textbf{5} & \textbf{8,240} & \textbf{0.442} & \textbf{0.812} \\
-                    6 & 7,410 & 0.398 & 0.855 \\
-                    7 & 6,820 & 0.375 & 0.891 \\
-                    \bottomrule
-                \end{tabular}
-            \end{block}
-        \end{column}
-    \end{columns}
-\end{frame}
-
-% ==============================================================================
-% SLIDE 8: SPATIAL TYPOLOGIES ANALYSIS (Page 8)
-% ==============================================================================
-\begin{frame}{7. Spatial Typologies of Indian Districts}
-    \begin{table}[h]
-        \centering
-        \footnotesize
-        \caption{Summary of 5 National District Crime Typologies ($N = 964$)}
-        \rowcolors{2}{softgray}{white}
-        \begin{tabular}{clccp{5.2cm}}
-            \toprule
-            \textbf{Cluster} & \textbf{Typology Label} & \textbf{Districts} & \textbf{\% Share} & \textbf{Dominant Crime Characterization} \\
-            \midrule
-            \textbf{0} & Women \& Child Vulnerability & 170 & 17.6\% & High rape, POCSO, and domestic harassment ratios. \\
-            \textbf{1} & Agrarian \& Caste Vulnerable & 577 & 59.8\% & Elevated SC/ST atrocities, property disputes. \\
-            \textbf{2} & High-Intensity Urban Hubs & 35 & 3.6\% & High total volume, violent crime, complex IPC. \\
-            \textbf{3} & Low-Intensity Baseline & 96 & 10.0\% & Low overall crime burden across all categories. \\
-            \textbf{4} & Moderate Mixed-Crime Hubs & 86 & 8.9\% & Cybercrime intensity combined with theft/SLL. \\
-            \bottomrule
-        \end{tabular}
-    \end{table}
-
-    \begin{alertblock}{Key Spatial Finding}
-        Over \textbf{59.8\% of Indian districts} belong to Cluster 1 (Agrarian \& Caste Vulnerable), highlighting structural socio-economic drivers behind regional rural crime patterns.
-    \end{alertblock}
-\end{frame}
-
-% ==============================================================================
-% SLIDE 9: DBSCAN ANOMALY DETECTION (Page 9)
-% ==============================================================================
-\begin{frame}{8. Density-Based Anomaly Detection (DBSCAN)}
-    \begin{columns}[T]
-        \begin{column}{0.5\textwidth}
-            \begin{block}{Algorithm Hyperparameters}
-                DBSCAN applied to top Principal Components:
-                $$\epsilon = 0.85, \quad MinPts = 5$$
-                Districts classified as noise points ($Label = -1$) lack sufficient density neighborhood support:
-                $$|N_\epsilon(p)| < MinPts$$
-            \end{block}
-            \begin{block}{Outlier Characteristics}
-                Outlier districts exhibit extreme multi-dimensional crime profiles (e.g., disproportionate cyber fraud spikes or extreme violent ratios).
-            \end{block}
-        \end{column}
-        \begin{column}{0.46\textwidth}
-            \begin{block}{Anomaly Detection Results}
-                \begin{itemize}
-                    \item \textbf{Total Anomalies Identified:} \textbf{28 Districts} (2.9\% of all districts).
-                    \item \textbf{Geographic Concentration:} Primary clusters found in industrial corridors and cross-state border districts.
-                    \item \textbf{Policy Impact:} Requires targeted audit rather than standard cluster policing.
-                \end{itemize}
-            \end{block}
-        \end{column}
-    \end{columns}
-\end{frame}
-
-% ==============================================================================
-% SLIDE 10: METROPOLITAN POLICING QUADRANT ANALYSIS (Page 10)
-% ==============================================================================
-\begin{frame}{9. Metropolitan Policing Efficiency Benchmark}
-    \begin{columns}[T]
-        \begin{column}{0.52\textwidth}
-            \begin{block}{4-Quadrant Benchmark Matrix}
-                Evaluates \textbf{37 Million-Plus Cities} across:
-                \begin{itemize}
-                    \item \textbf{X-Axis:} Median Crime Rate per 100k population.
-                    \item \textbf{Y-Axis:} Chargesheeting Rate (\%).
-                \end{itemize}
-            \end{block}
-            \scriptsize
-            \rowcolors{2}{softgray}{white}
-            \begin{tabular}{lp{3.2cm}}
-                \toprule
-                \textbf{Quadrant} & \textbf{City Profile \& Count} \\
-                \midrule
-                \textbf{Q1: Critical Bottleneck} & High Crime Rate, Low Chargesheeting (\textbf{6 Cities}). \\
-                \textbf{Q2: High Load \& Efficient} & High Crime Rate, High Chargesheeting (\textbf{9 Cities}). \\
-                \textbf{Q3: Effective Containment} & Low Crime Rate, High Chargesheeting (\textbf{10 Cities}). \\
-                \textbf{Q4: Latent Risk / Under-report} & Low Crime Rate, Low Chargesheeting (\textbf{12 Cities}). \\
-                \bottomrule
-            \end{tabular}
-        \end{column}
-        \begin{column}{0.46\textwidth}
-            \begin{block}{Policing Matrix Diagram}
-                \centering
-                \begin{tikzpicture}[scale=0.65]
-                    \draw[->, thick] (0,0) -- (6,0) node[right] {\tiny Crime Rate};
-                    \draw[->, thick] (0,0) -- (0,5) node[above] {\tiny Chargesheet \%};
-                    \draw[dashed, red] (3,0) -- (3,5);
-                    \draw[dashed, red] (0,2.5) -- (6,2.5);
-                    \node at (1.5, 3.75) {\tiny \textbf{Q3: Containment} (10)};
-                    \node at (4.5, 3.75) {\tiny \textbf{Q2: High-Eff} (9)};
-                    \node at (1.5, 1.25) {\tiny \textbf{Q4: Latent Risk} (12)};
-                    \node at (4.5, 1.25) {\tiny \textbf{Q1: Bottleneck} (6)};
-                \end{tikzpicture}
-            \end{block}
-        \end{column}
-    \end{columns}
-\end{frame}
-
-% ==============================================================================
-% SLIDE 11: CAUSAL MOTIVE DECOMPOSITION (Page 11)
-% ==============================================================================
-\begin{frame}{10. Causal Motive Decomposition: Murder \& Cyber}
-    \begin{columns}[T]
-        \begin{column}{0.48\textwidth}
-            \begin{block}{Top Murder Motives (35 Categories)}
-                \small
-                \rowcolors{2}{softgray}{white}
-                \begin{tabular}{lrr}
-                    \toprule
-                    \textbf{Motive Category} & \textbf{Cases} & \textbf{\% Share} \\
-                    \midrule
-                    Personal Vendetta / Enmity & 196 & 31.2\% \\
-                    Petty Quarrels / Disputes & 177 & 28.2\% \\
-                    Property & 94 & 15.0\% \\
-                    Illicit Relationships & 68 & 10.8\% \\
-                    Gain / Robbery & 35 & 5.6\% \\
-                    Organized Gang Rivalry & \textbf{17} & \textbf{2.7\%} \\
-                    \bottomrule
-                \end{tabular}
-            \end{block}
-        \end{column}
-        \begin{column}{0.48\textwidth}
-            \begin{block}{Top Cybercrime Motives (25 Categories)}
-                \small
-                \rowcolors{2}{softgray}{white}
-                \begin{tabular}{lrr}
-                    \toprule
-                    \textbf{Motive Category} & \textbf{Cases} & \textbf{\% Share} \\
-                    \midrule
-                    Financial Fraud / Gain & \textbf{3,147} & \textbf{72.4\%} \\
-                    Sexual Exploitation & 482 & 11.1\% \\
-                    Personal Revenge & 265 & 6.1\% \\
-                    Identity Theft & 210 & 4.8\% \\
-                    Extortion / Blackmail & 142 & 3.3\% \\
-                    \bottomrule
-                \end{tabular}
             \end{block}
         \end{column}
     \end{columns}
 
     \vspace{0.2cm}
-    \begin{alertblock}{Empirical Motive Insight}
-        Personal disputes drive \textbf{59.4\% of murders} (gang violence is $<3\%$), while financial fraud dominates \textbf{72.4\% of cybercrime}.
-    \end{alertblock}
+    \begin{block}{Target Deliverable}
+        An end-to-end, reproducible Big Data Analytics platform transforming unstructured government registries into actionable spatial insights.
+    \end{block}
 \end{frame}
 
 % ==============================================================================
-% SLIDE 12: DASHBOARD & AI ARCHITECTURE (Page 12)
+% SLIDE 4: EXISTING SYSTEM / LITERATURE REVIEW
 % ==============================================================================
-\begin{frame}{11. Production Glassmorphic Dashboard \& AI}
+\begin{frame}{Slide 4: Existing System / Literature Review}
     \begin{columns}[T]
-        \begin{column}{0.5\textwidth}
-            \begin{block}{Streamlit UI Architecture}
+        \begin{column}{0.50\textwidth}
+            \begin{block}{Existing NCRB Reporting Limitations}
                 \begin{itemize}
-                    \item \textbf{Glassmorphism Design:} Centralized CSS styling (\texttt{theme.py}) using translucent backdrop blurs and subtle borders.
-                    \item \textbf{6 Interactive Views:} Overview, District Explorer, Spatial Clustering, Metropolitan Quadrants, Anomalies, and AI Assistant.
-                    \item \textbf{Optimized Caching:} Parquet data loading cached via \texttt{@st.cache\_data}.
+                    \item \textbf{Static Aggregations:} Published primarily as static PDF/Excel tables without multi-dimensional cross-filtering.
+                    \item \textbf{Raw Volume Distortion:} Highly populated districts dominate absolute volume counts without per-capita normalization.
+                    \item \textbf{Lack of Unsupervised ML:} Absence of automated spatial clustering and density-based anomaly discovery.
                 \end{itemize}
             \end{block}
         \end{column}
-        \begin{column}{0.46\textwidth}
-            \begin{block}{Groq Intelligence Assistant}
+        \begin{column}{0.48\textwidth}
+            \begin{block}{Literature \& Methodological Gap}
                 \begin{itemize}
-                    \item \textbf{Model:} Groq LLaMA 3.3 70B crime query assistant (\texttt{ai\_assistant.py}).
-                    \item \textbf{Strict Guardrails:} Enforces domain-scoped context (NCRB 2024 data only) and rejects non-crime queries.
-                    \item \textbf{Fallback Mode:} Graceful fallback when API key is unconfigured.
+                    \item \textbf{Decoupled Hierarchy:} Existing studies mix rural districts and megacities without a dual-tier framework.
+                    \item \textbf{Outlier Sensitivity:} Standard MinMax scaling suffers from extreme district skew; addressed here by \textbf{RobustScaler}.
+                    \item \textbf{Integrated AI:} Prior platforms lack guardrailed LLM conversational assistants for non-technical planners.
                 \end{itemize}
             \end{block}
         \end{column}
@@ -450,30 +165,228 @@
 \end{frame}
 
 % ==============================================================================
-% SLIDE 13: STRATEGIC POLICY MATRIX & CONCLUSION (Page 13)
+% SLIDE 5: PROPOSED SYSTEM AND METHODOLOGY
 % ==============================================================================
-\begin{frame}{12. Strategic Policy Matrix \& Conclusion}
+\begin{frame}{Slide 5: Proposed System and Methodology}
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{block}{Feature Engineering \& Normalization}
+                \footnotesize
+                \begin{itemize}
+                    \item \textbf{25 Domain Composite Ratios:} Derived Violent Crime Ratio, Women Vulnerability Share, Cyber Intensity, Caste Atrocity Index, etc.
+                    \item \textbf{Robust Scaling:} Scaled via median and IQR ($x' = \frac{x - Q_2}{Q_3 - Q_1}$) to withstand heavy skewness.
+                    \item \textbf{Validation:} Verified distributions in \texttt{02\_data\_preprocessing.ipynb}.
+                \end{itemize}
+            \end{block}
+            \begin{block}{Skewness Diagnostic Matrix}
+                \scriptsize
+                \begin{tabular}{lrr}
+                    \toprule
+                    \textbf{Engineered Feature} & \textbf{Median} & \textbf{Skewness} \\
+                    \midrule
+                    Violent Crime Ratio & 0.0154 & +1.90 \\
+                    Women Vulnerability & 0.1330 & +25.33 \\
+                    Cyber Intensity (per 1k) & 9.9930 & +30.04 \\
+                    \bottomrule
+                \end{tabular}
+            \end{block}
+        \end{column}
+        \begin{column}{0.50\textwidth}
+            % Graph Placeholder from 02_data_preprocessing.ipynb (Section 4)
+            \graphplaceholder[0.55\textheight]{district_feature_distributions.png}{District Feature Distributions (02\_data\_preprocessing.ipynb)}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% ==============================================================================
+% SLIDE 6: SYSTEM ARCHITECTURE / WORKFLOW / DESIGN
+% ==============================================================================
+\begin{frame}{Slide 6: System Architecture / Workflow / Design}
+    \begin{columns}[T]
+        \begin{column}{0.50\textwidth}
+            \begin{block}{End-to-End Processing Architecture}
+                \centering
+                \tikzstyle{box} = [rectangle, rounded corners, minimum width=2.6cm, minimum height=0.55cm, text centered, draw=navyblue, fill=cardbg, font=\tiny\bfseries]
+                \begin{tikzpicture}[node distance=0.85cm]
+                    \node (raw) [box] {17 Raw NCRB Excel Workbooks};
+                    \node (parse) [box, below of=raw] {Custom \texttt{openpyxl} Parser (Header \& State Stripping)};
+                    \node (parq) [box, below of=parse] {Clean Domain Parquets + Audit Manifest};
+                    \node (feat) [box, below of=parq] {District Master Matrix ($964 \times 696$) + 25 Ratios};
+                    \node (ml) [box, below of=feat] {Unsupervised ML (PCA $\to$ K-Means $\to$ DBSCAN)};
+                    \node (ui) [box, below of=ml] {Streamlit Glassmorphic Dashboard + Groq AI};
+                    \draw [->, thick, crimsonred] (raw) -- (parse);
+                    \draw [->, thick, crimsonred] (parse) -- (parq);
+                    \draw [->, thick, crimsonred] (parq) -- (feat);
+                    \draw [->, thick, crimsonred] (feat) -- (ml);
+                    \draw [->, thick, crimsonred] (ml) -- (ui);
+                \end{tikzpicture}
+            \end{block}
+        \end{column}
+        \begin{column}{0.48\textwidth}
+            \begin{block}{Architecture Highlights}
+                \footnotesize
+                \begin{itemize}
+                    \item \textbf{Dual-Tier Separation:} Decouples 964 District entities from 37 Metropolitan cities.
+                    \item \textbf{Schema Preservation:} Apache Parquet storage for high-throughput I/O and zero column truncation.
+                    \item \textbf{Strict Guardrails:} AI assistant scoped strictly to NCRB 2024 ground truth.
+                \end{itemize}
+            \end{block}
+            \begin{alertblock}{Design Robustness}
+                \footnotesize
+                100\% automated end-to-end pipeline with zero manual intervention.
+            \end{alertblock}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% ==============================================================================
+% SLIDE 7: IMPLEMENTATION – MODULES AND TECHNOLOGIES
+% ==============================================================================
+\begin{frame}{Slide 7: Implementation – Modules and Technologies}
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{block}{Technology Stack \& Libraries}
+                \footnotesize
+                \begin{itemize}
+                    \item \textbf{Core Engine:} Python 3.11, Pandas, NumPy, OpenPyXL.
+                    \item \textbf{Machine Learning:} Scikit-learn (PCA, KMeans, DBSCAN, RobustScaler), SciPy.
+                    \item \textbf{Visualization:} Seaborn, Matplotlib, Plotly Express.
+                    \item \textbf{Application:} Streamlit Glassmorphism (\texttt{theme.py}), Groq Cloud SDK (LLaMA 3.3 70B).
+                \end{itemize}
+            \end{block}
+            \begin{block}{Core Codebase Modules}
+                \scriptsize
+                \texttt{curated\_loader.py} $\cdot$ \texttt{run\_preprocessing.py} $\cdot$ \texttt{clustering.py} $\cdot$ \texttt{ai\_assistant.py} $\cdot$ \texttt{app.py}
+            \end{block}
+        \end{column}
+        \begin{column}{0.50\textwidth}
+            % Graph Placeholder from 02_data_preprocessing.ipynb (Section 5)
+            \graphplaceholder[0.55\textheight]{metro_growth_chargesheeting_trends.png}{Metro CAGR \& Efficiency (02\_data\_preprocessing.ipynb)}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% ==============================================================================
+% SLIDE 8: RESULTS, SCREENSHOTS AND PERFORMANCE
+% ==============================================================================
+\begin{frame}{Slide 8: Results, Screenshots and Performance}
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{block}{Key Empirical Findings}
+                \footnotesize
+                \begin{itemize}
+                    \item \textbf{PCA Projection:} Top 2 components capture \textbf{66.8\% variance} (PC1 aggregate scale vs. PC2 cyber/violent).
+                    \item \textbf{Cluster 1 Belt (59.8\%):} 577 districts face agrarian \& caste-related vulnerabilities.
+                    \item \textbf{Motive Analysis:} Personal vendetta drives 59.4\% of murders; financial fraud drives 72.4\% of cybercrime.
+                \end{itemize}
+            \end{block}
+            \graphplaceholder[0.26\textheight]{pca_cluster_biplot.png}{PCA 2D Cluster Biplot}
+        \end{column}
+        \begin{column}{0.50\textwidth}
+            % Graph Placeholder for Dashboard Screenshot / Metro Quadrant Plot
+            \graphplaceholder[0.55\textheight]{metro_policing_efficiency_quadrant.png}{Metro Policing 4-Quadrant Benchmark}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% ==============================================================================
+% SLIDE 9: TESTING AND VALIDATION
+% ==============================================================================
+\begin{frame}{Slide 9: Testing and Validation}
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{block}{Data Quality \& Schema Audits}
+                \footnotesize
+                \begin{itemize}
+                    \item \textbf{Portfolio Verification:} Automated hash and column verification across all 17 NCRB datasets.
+                    \item \textbf{Zero Missingness:} Clean matrices verified with exactly \textbf{0 null values} across 964 districts.
+                \end{itemize}
+            \end{block}
+            \begin{block}{Model Evaluation Metrics ($k=5$)}
+                \scriptsize
+                \begin{itemize}
+                    \item \textbf{Peak Silhouette Score:} $S = 0.442$ at $k=5$.
+                    \item \textbf{Davies-Bouldin Minimum:} $DB = 0.812$ at $k=5$.
+                    \item \textbf{DBSCAN Anomaly Audit:} 28 outlier districts isolated ($\epsilon=0.85, MinPts=5$).
+                \end{itemize}
+            \end{block}
+        \end{column}
+        \begin{column}{0.50\textwidth}
+            % Graph Placeholder for Elbow & Silhouette Validation Curve
+            \graphplaceholder[0.55\textheight]{elbow_silhouette_analysis.png}{Elbow Curve \& Silhouette Analysis ($k=2..8$)}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% ==============================================================================
+% SLIDE 10: LIMITATIONS AND FUTURE SCOPE
+% ==============================================================================
+\begin{frame}{Slide 10: Limitations and Future Scope}
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{block}{Current Project Limitations}
+                \begin{itemize}
+                    \item \textbf{Reporting Latency:} NCRB registries represent annual retrospective data releases.
+                    \item \textbf{Dark Figure of Crime:} Data captures registered FIRs, which can be influenced by local reporting frictions.
+                    \item \textbf{Sub-District Granularity:} Analysis bounded at district and metropolitan levels.
+                \end{itemize}
+            \end{block}
+        \end{column}
+        \begin{column}{0.48\textwidth}
+            \begin{block}{Future Enhancement Scope}
+                \begin{itemize}
+                    \item \textbf{Real-Time CCTNS API:} Direct integration with live police FIR feed databases.
+                    \item \textbf{Temporal Deep Learning:} Spatio-temporal LSTM/Graph Neural Networks for crime rate forecasting.
+                    \item \textbf{GIS Choropleth Mapping:} Interactive GeoJSON district polygon layers for hot-spot heatmaps.
+                \end{itemize}
+            \end{block}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% ==============================================================================
+% SLIDE 11: CONCLUSION
+% ==============================================================================
+\begin{frame}{Slide 11: Conclusion}
     \begin{table}[h]
         \centering
         \scriptsize
-        \caption{Empirical Finding to Policy Action Matrix}
+        \caption{Empirical Findings to Strategic Interventions}
         \rowcolors{2}{softgray}{white}
         \begin{tabular}{lp{6.5cm}}
             \toprule
             \textbf{Empirical Finding} & \textbf{Targeted Strategic Intervention} \\
             \midrule
-            170 Women Vulnerability Districts & Deploy specialized Women \& Child Protection Cells in Cluster 0 districts. \\
-            577 Agrarian Caste-Vulnerable Districts & Fast-track PoA Act enforcement and rural dispute resolution mechanisms. \\
-            6 Bottleneck Metro Cities (Q1) & Inject forensic capacity and scale up chargesheeting investigation teams. \\
-            72.4\% Cybercrime Financial Fraud & Expand specialized digital fraud task forces and banking safety protocols. \\
-            28 DBSCAN Anomaly Districts & Initiate targeted state-level data quality and crime reporting audits. \\
+            170 Women Vulnerability Districts & Deploy specialized Women \& Child Protection Units (Cluster 0). \\
+            577 Agrarian/Caste Districts & Strengthen PoA Act enforcement and rural dispute resolution (Cluster 1). \\
+            6 Bottleneck Metro Cities (Q1) & Inject forensic resources and scale up chargesheeting teams. \\
+            72.4\% Cyber Financial Fraud & Deploy bank-integrated digital fraud rapid response units. \\
+            28 DBSCAN Anomaly Districts & Initiate state-level data quality and crime registration audits. \\
             \bottomrule
         \end{tabular}
     \end{table}
 
-    \begin{block}{Project Impact Summary}
-        Successfully built an end-to-end Big Data Analytics suite converting \textbf{17 raw NCRB datasets} into actionable intelligence for law enforcement and policy planners.
+    \begin{block}{Project Summary}
+        Successfully delivered a production-ready Big Data Analytics suite converting complex NCRB registries into actionable public safety intelligence.
     \end{block}
+\end{frame}
+
+% ==============================================================================
+% SLIDE 12: REFERENCES
+% ==============================================================================
+\begin{frame}{Slide 12: References}
+    \footnotesize
+    \begin{enumerate}
+        \item \textbf{National Crime Records Bureau (NCRB),} \textit{"Crime in India 2024: Statistics Volume I, II \& III,"} Ministry of Home Affairs, Government of India, New Delhi.
+        \item \textbf{Pedregosa, F., et al.,} \textit{"Scikit-learn: Machine Learning in Python,"} Journal of Machine Learning Research (JMLR), Vol. 12, pp. 2825--2830.
+        \item \textbf{Ester, M., Kriegel, H. P., Sander, J., \& Xu, X.,} \textit{"A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases with Noise,"} KDD-96 Proceedings, AAAI Press.
+        \item \textbf{McKinney, W.,} \textit{"Data Structures for Statistical Computing in Python,"} Proceedings of the 9th Python in Science Conference.
+        \item \textbf{Groq Cloud Documentation,} \textit{"LLaMA 3.3 70B High-Throughput Inference Engine,"} 2024.
+    \end{enumerate}
+
+    \vspace{0.3cm}
+    \centering
+    \textcolor{navyblue}{\textbf{\large Thank You! Questions \& Discussion}}
 \end{frame}
 
 \end{document}

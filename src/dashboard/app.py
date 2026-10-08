@@ -1,4 +1,4 @@
-"""
+r"""
 NCRB 2024 Crime Analytics Dashboard — Main Streamlit Application.
 
 Interactive dashboard for exploring spatial crime clustering, metropolitan policing
@@ -143,10 +143,49 @@ st.markdown(
             border-bottom: 2px solid {PRIMARY} !important;
         }}
 
-        /* Hide Streamlit default chrome */
+        /* Hide Streamlit default chrome while keeping the sidebar toggle visible */
         #MainMenu {{visibility: hidden;}}
         footer {{visibility: hidden;}}
-        header {{visibility: hidden;}}
+        header {{
+            background: transparent !important;
+        }}
+        header [data-testid="stToolbar"] {{
+            visibility: hidden;
+        }}
+        header [data-testid="stDecoration"] {{
+            visibility: hidden;
+        }}
+
+        /* Ensure sidebar retract / expand controls remain visible */
+        [data-testid="stSidebarCollapsedControl"],
+        [data-testid="stSidebarCollapseButton"],
+        [data-testid="collapsedControl"] {{
+            visibility: visible !important;
+            display: flex !important;
+            z-index: 100001 !important;
+        }}
+
+        [data-testid="stSidebarCollapsedControl"] {{
+            background: rgba(17, 23, 36, 0.85) !important;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            border-radius: 8px;
+            top: 0.75rem !important;
+            left: 0.75rem !important;
+            transition: all 0.2s ease;
+        }}
+
+        [data-testid="stSidebarCollapsedControl"]:hover {{
+            border-color: rgba(59, 130, 246, 0.5) !important;
+            background: rgba(24, 34, 52, 0.9) !important;
+        }}
+
+        [data-testid="stSidebarCollapsedControl"] button,
+        [data-testid="stSidebarCollapsedControl"] svg {{
+            color: #F8FAFC !important;
+            fill: #F8FAFC !important;
+        }}
 
         /* Plotly chart container rounded edges */
         .js-plotly-plot {{
